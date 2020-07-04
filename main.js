@@ -212,8 +212,11 @@ var field;
 
 var btype, brot;
 var bx, by;
+var cnt;
 
 function init() {
+  cnt = 1; //カウンタ変数
+
   field = [ //fieldの内容
     //壁を9とする。何もないマスは0とする。
     [9, 9, 9, 0, 0, 0, 0, 0, 0, 9, 9, 9,],
@@ -244,6 +247,13 @@ function init() {
   by = 0; //ブロックのY座標（マス）
   btype = 0; //ブロックの種類
   brot = 0; //ブロックの回転種類
+}
+
+//更新関数
+function update() {
+  if(cnt % 30 == 0) {
+    by++; //ブロックを１マス落下
+  }
 }
 
 //落下ブロックの描画
@@ -293,9 +303,13 @@ requestAnimationFrame(main);
 function main() {
   context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+  update(); //更新
+
   drawBlock(); //ブロックを描画
   drawField(); //フィールドを描画
   drawFrame(); //フィールド枠を描画
+
+  cnt++; //カウンタを更新
 
   requestAnimationFrame(main);
 }
