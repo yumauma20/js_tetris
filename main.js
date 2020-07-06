@@ -225,6 +225,8 @@ var field;
 var bflag;
 var btype, brot;
 var bx, by;
+
+var delflag; //ブロックの削除フラグ
 var cnt;
 
 function init() {
@@ -262,6 +264,8 @@ function init() {
   by = 0; //ブロックのY座標（マス）
   btype = 3; //ブロックの種類
   brot = 0; //ブロックの回転種類
+
+  delflag = Array(FIELD_HEIGHT); //配列として定義
 }
 
 // キー操作関数
@@ -361,12 +365,38 @@ function enterBlock() {
     }
   }
 
+  deleteJudge(); //削除行を検索
+
   bflag = false;
   bx = 4;
   by = -4;
 
   btype = 0;
   brot = 0;
+}
+
+function deleteJudge() {
+  for(var i = 1; i < FIELD_HEIGHT - 1; i++) {
+    for(var j = 1; j < FIELD_WIDTH - 1; j++) {
+      if(field[i][j] != 0) {
+        delflag[i] = true;
+      }
+      else if(field[i][j] == 0) { //行の中に一つでも空白があったらループを抜ける
+        delflag[i] = false;
+        break;
+      }
+    }
+  }
+
+  for(var i = 1; i < FIELD_HEIGHT; i++) {
+    if(!delflag[i])continue;
+
+    //ブロック行を削除
+    for(var j = 1; j < FIELD_WIDTH - 1; j++) field[i][j] = 0;
+  }
+
+  //delflagの初期化
+  for(var i = 0; i < FIELD_HEIGHT; i++) delflag[i] = false;
 }
 
 //落下ブロックの描画
