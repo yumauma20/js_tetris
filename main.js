@@ -357,7 +357,7 @@ function enterBlock() {
         if(block[btype][brot][i][j] == 0) continue;
 
         //ブロックをフィールドに登録
-        field[by + i][bx + j] = 9;
+        field[by + i][bx + j] = 1;
     }
   }
 
