@@ -222,6 +222,7 @@ var context = canvas.getContext("2d");
 
 var field;
 
+var bflag;
 var btype, brot;
 var bx, by;
 var cnt;
@@ -254,6 +255,8 @@ function init() {
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9,],
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,],
   ];
+
+  bflag = false; //ブロックの着地フラグ
 
   bx = 4; //ブロックのX座標（マス）
   by = 0; //ブロックのY座標（マス）
@@ -330,6 +333,7 @@ function update() {
 
         //同じ座標にブロックとブロック・壁が重なった場合
         if(field[by + i][bx + j] != 0 && block[btype][brot][i][j] == 1) {
+          bflag = true; //
 					by--; // 移動距離分を戻す
 					breakflag = true; // ループを抜ける
 					break;
@@ -338,6 +342,31 @@ function update() {
       if(breakflag) break;
     }
   }
+}
+
+//落下ブロックの登録
+function enterBlock() {
+  if(!bflag) return;
+
+  for(var i = 0; i < BLOCK_HEIGHT; i++) {
+    for(var j = 0; j < BLOCK_WIDTH; j++) {
+      if(bx + j < 0 || bx + j >= FIELD_WIDTH ||
+        by + i < 0 || by + i >= FIELD_HEIGHT) continue;
+        
+        //ブロックが「０」なら処理しない
+        if(block[btype][brot][i][j] == 0) continue;
+
+        //ブロックをフィールドに登録
+        field[by + i][bx + j] = 9;
+    }
+  }
+
+  bflag = false;
+  bx = 4;
+  by = -4;
+
+  btype = 0;
+  brot = 0;
 }
 
 //落下ブロックの描画
@@ -359,8 +388,13 @@ function drawField() {
 	for(var i = 0;i < FIELD_HEIGHT;i++) {
 		for(var j = 0;j < FIELD_WIDTH;j++) {
 			if(field[i][j] == 0) continue; // 「０」なら描画しない
-			
-			context.fillStyle = "rgba(150, 150, 150, 1.0)"; // グレーに設定
+      
+      var str;
+      switch(field[i][j]) { 
+        case 1: str = "rgba(255, 100, 100, 1.0)"; break; //赤に設定
+        case 9: str = "rgba(150, 150, 150, 1.0)"; break; //グレーに設定
+      }
+			context.fillStyle = str;
 			context.fillRect(FIELD_X + j * 25, FIELD_Y + i * 25, 25, 25); // 25×25の矩形（マス）を描画
 		}
 	}
@@ -413,6 +447,7 @@ function main() {
 
   keyCtrl(); // キー操作
   update(); //更新
+  enterBlock(); //ブロックの登録
 
   drawBlock(); //ブロックを描画
   drawField(); //フィールドを描画
