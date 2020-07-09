@@ -15,6 +15,9 @@ let FIELD_HEIGHT = 22;　//フィールドの高さ
 let FIELD_X = 40;　//フィールドのcanvas内のX座標
 let FIELD_Y = 40;　//フィールドのcanvas内のY座標
 
+let NEXT_FIELD_X	= CANVAS_WIDTH - 200; // Next表示用の枠の左上座標（X）
+let NEXT_FIELD_Y	= FIELD_Y; // Next表示用の枠の左上座標（Y）
+
 let KEY_RIGHT		= 0; // 右キー
 let KEY_LEFT		= 1; // 左キー
 let KEY_UP			= 2; // 上キー
@@ -231,6 +234,8 @@ var bflag; //ブロックの着地フラグ
 var btype, brot, bcolor;
 var bx, by;
 
+var nbtype, nbrot, nbcolor; // Next表示用 
+
 var delflag; //ブロックの削除フラグ
 var dropflag; //行削除後のブロック落下フラグ
 var cnt;
@@ -272,6 +277,13 @@ function init() {
   brot = 0; //ブロックの回転種類
   bcolor = 4; //ブロックの色
 
+  nbtype = Math.floor(Math.random() * 7); // 次のブロックの種類
+	nbrot = Math.floor(Math.random() * 4); // 次のブロックの回転種類
+	nbcolor = Math.floor(Math.random() * 100); // 次のブロックの色
+	if(nbcolor < 35)		nbcolor = 1; // 赤色 35%
+	else if(nbcolor < 65)	nbcolor = 2; // 青色 30%
+	else if(nbcolor < 85)	nbcolor = 3; // 緑色 20%
+	else					nbcolor = 4; // 黄色 15%
   initBlock(); // ブロック初期化
 
   delflag = Array(FIELD_HEIGHT); //配列として定義
@@ -530,15 +542,67 @@ function drawFrame() {
   }
 }
 
+//	Nextブロック領域の描画
+function drawNextBlock() {
+	// 枠の描画
+	context.fillStyle = "rgba(230, 230, 230, 1.0)"; // 白色に設定
+	
+	context.fillRect(NEXT_FIELD_X,		NEXT_FIELD_Y,		150, 1);
+	context.fillRect(NEXT_FIELD_X,		NEXT_FIELD_Y + 150, 150, 1);
+	context.fillRect(NEXT_FIELD_X,		NEXT_FIELD_Y,		1, 150);
+	context.fillRect(NEXT_FIELD_X + 150,NEXT_FIELD_Y,		1, 150);
+	
+	// ブロックの描画
+	//	１：赤色　２：青色　３：緑色　４：黄色　９：灰色　に設定
+	var str;
+	switch(nbcolor) {
+	case 1: str = BLOCK_RED_COLOR; break;
+	case 2: str = BLOCK_BLU_COLOR; break;
+	case 3: str = BLOCK_GRE_COLOR; break;
+	case 4: str = BLOCK_YEL_COLOR; break;
+	case 9: str = "rgba(150, 150, 150, 1.0)"; break;
+	}
+	context.fillStyle = str;
+	
+	for(var i = 0;i < BLOCK_HEIGHT;i++) {
+		for(var j = 0;j < BLOCK_WIDTH;j++) {
+			if(block[nbtype][nbrot][i][j] == 1) {
+				context.fillRect(NEXT_FIELD_X + 25 + j * 25, NEXT_FIELD_Y + 15 + 25 + i * 25, 25, 25);
+			}
+		}
+	}
+ 
+	// ブロックの枠の描画
+	context.fillStyle = "rgba(230, 230, 230, 1.0)";
+	for(var i = 0;i < BLOCK_HEIGHT;i++) {
+		for(var j = 0;j < BLOCK_WIDTH;j++) {
+			if(block[nbtype][nbrot][i][j] == 1) {
+				context.fillRect(NEXT_FIELD_X + 25 + j * 25,		NEXT_FIELD_Y + 15 + 25 + i * 25,		25, 1);
+				context.fillRect(NEXT_FIELD_X + 25 + j * 25,		NEXT_FIELD_Y + 15 + 25 + i * 25 + 25,	25, 1);
+				context.fillRect(NEXT_FIELD_X + 25 + j * 25, 		NEXT_FIELD_Y + 15 + 25 + i * 25,		1, 25);
+				context.fillRect(NEXT_FIELD_X + 25 + j * 25 + 25,	NEXT_FIELD_Y + 15 + 25 + i * 25,		1, 25);
+			}
+		}
+	}
+	
+	context.font = "bold 20px sans-serif";
+	context.fillText("Next", NEXT_FIELD_X + 50, 60);
+	context.fillRect(NEXT_FIELD_X, 70, 150, 1);
+}
+
 //ブロック初期化関数
 function initBlock() {
-  btype = Math.floor(Math.random() * 7);//落下ブロックの種類
-  brot = Math.floor(Math.random() * 4);	//	落下ブロックの回転種類
-	bcolor = Math.floor(Math.random() * 100); // 落下ブロックの色
-	if(bcolor < 35)			bcolor = 1; // 赤色 35%
-	else if(bcolor < 65)	bcolor = 2; // 青色 30%
-	else if(bcolor < 85)	bcolor = 3; // 緑色 20%
-	else					bcolor = 4; // 黄色 15%
+  btype = nbtype; // 落下ブロックの種類
+	brot = nbrot; // 落下ブロックの回転種類
+	bcolor = nbcolor; // 落下ブロックの色
+	
+	nbtype = Math.floor(Math.random() * 7); // 次のブロックの種類
+	nbrot = Math.floor(Math.random() * 4); // 次のブロックの回転種類
+	nbcolor = Math.floor(Math.random() * 100); // 次のブロックの色
+	if(nbcolor < 35)		nbcolor = 1; // 赤色 35%
+	else if(nbcolor < 65)	nbcolor = 2; // 青色 30%
+	else if(nbcolor < 85)	nbcolor = 3; // 緑色 20%
+	else					nbcolor = 4; // 黄色 15%
 }
 
 document.addEventListener("keydown", e => { //キー押下処理
@@ -578,6 +642,7 @@ function main() {
   drawBlock(); //ブロックを描画
   drawField(); //フィールドを描画
   drawFrame(); //フィールド枠を描画
+  drawNextBlock(); // Next表示を描画
 
   cnt++; //カウンタを更新
 
