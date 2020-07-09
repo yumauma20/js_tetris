@@ -4,6 +4,11 @@ let CANVAS_HEIGHT = 600; //canvasの高さ
 let BLOCK_WIDTH = 4; //ブロックの領域幅
 let BLOCK_HEIGHT = 4; //ブロックの領域高さ
 
+let BLOCK_RED_COLOR	= "rgba(255, 100, 100, 1.0)"; // 赤色
+let BLOCK_BLU_COLOR	= "rgba(100, 100, 255, 1.0)"; // 青色
+let BLOCK_GRE_COLOR	= "rgba(100, 255, 100, 1.0)"; // 緑色
+let BLOCK_YEL_COLOR	= "rgba(255, 255, 100, 1.0)"; // 黄色
+
 let FIELD_WIDTH = 12; //フィールドの幅
 let FIELD_HEIGHT = 22;　//フィールドの高さ
 
@@ -222,8 +227,8 @@ var context = canvas.getContext("2d");
 
 var field;
 
-var bflag;
-var btype, brot;
+var bflag; //ブロックの着地フラグ
+var btype, brot, bcolor;
 var bx, by;
 
 var delflag; //ブロックの削除フラグ
@@ -265,6 +270,7 @@ function init() {
   by = 0; //ブロックのY座標（マス）
   btype = 3; //ブロックの種類
   brot = 0; //ブロックの回転種類
+  bcolor = 4; //ブロックの色
 
   delflag = Array(FIELD_HEIGHT); //配列として定義
   dropflag = false;
@@ -434,6 +440,7 @@ function enterBlock() {
 
   btype = 0;
   brot = 0;
+  bcolor = 4; //ブロックの色
 }
 
 function deleteJudge() {
@@ -464,7 +471,15 @@ function deleteJudge() {
 
 //落下ブロックの描画
 function drawBlock() {
-  context.fillStyle = "rgba(255, 100, 100, 1.0)"; //赤色に設定
+  var str;
+
+  switch(bcolor) {
+    case 1: str = BLOCK_RED_COLOR; break;
+    case 2: str = BLOCK_BLU_COLOR; break;
+    case 3: str = BLOCK_GRE_COLOR; break;
+    case 4: str = BLOCK_YEL_COLOR; break;
+  }
+  context.fillStyle = str; //色の設定
 
   //ブロックを描画
   for(var i = 0; i < BLOCK_HEIGHT; i++) {
@@ -484,7 +499,10 @@ function drawField() {
       
       var str;
       switch(field[i][j]) { 
-        case 1: str = "rgba(255, 100, 100, 1.0)"; break; //赤に設定
+        case 1: str = BLOCK_RED_COLOR; break; // 赤色
+        case 2: str = BLOCK_BLU_COLOR; break; // 青色
+        case 3: str = BLOCK_GRE_COLOR; break; // 緑色
+        case 4: str = BLOCK_YEL_COLOR; break; // 黄色
         case 9: str = "rgba(150, 150, 150, 1.0)"; break; //グレーに設定
       }
 			context.fillStyle = str;
