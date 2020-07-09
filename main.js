@@ -272,6 +272,8 @@ function init() {
   brot = 0; //ブロックの回転種類
   bcolor = 4; //ブロックの色
 
+  initBlock(); // ブロック初期化
+
   delflag = Array(FIELD_HEIGHT); //配列として定義
   dropflag = false;
 }
@@ -441,6 +443,8 @@ function enterBlock() {
   btype = 0;
   brot = 0;
   bcolor = 4; //ブロックの色
+
+  initBlock(); // ブロック初期化
 }
 
 function deleteJudge() {
@@ -524,6 +528,17 @@ function drawFrame() {
   for(var i = 0;i < FIELD_HEIGHT + 1;i++) {
     context.fillRect(FIELD_X, FIELD_Y + i * 25, 25 * FIELD_WIDTH, 1);
   }
+}
+
+//ブロック初期化関数
+function initBlock() {
+  btype = Math.floor(Math.random() * 7);//落下ブロックの種類
+  brot = Math.floor(Math.random() * 4);	//	落下ブロックの回転種類
+	bcolor = Math.floor(Math.random() * 100); // 落下ブロックの色
+	if(bcolor < 35)			bcolor = 1; // 赤色 35%
+	else if(bcolor < 65)	bcolor = 2; // 青色 30%
+	else if(bcolor < 85)	bcolor = 3; // 緑色 20%
+	else					bcolor = 4; // 黄色 15%
 }
 
 document.addEventListener("keydown", e => { //キー押下処理
