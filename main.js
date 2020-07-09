@@ -236,6 +236,8 @@ var bx, by;
 
 var nbtype, nbrot, nbcolor; // Next表示用 
 
+var spd; //スピード
+
 var delflag; //ブロックの削除フラグ
 var dropflag; //行削除後のブロック落下フラグ
 var cnt;
@@ -288,6 +290,8 @@ function init() {
 
   delflag = Array(FIELD_HEIGHT); //配列として定義
   dropflag = false;
+
+  spd = 30;
 }
 
 // キー操作関数
@@ -362,7 +366,7 @@ function rowJudge(num) {
 
 //更新関数
 function update() {
-  if(cnt % 5 == 0) {
+  if(cnt % Math.floor(spd) == 0 || (key[KEY_SPACE] > 0 && cnt % 4 == 0)) {
     if(dropflag) { //落下フラグがオンなら
       var num = 0; //削除された行の番号
 
@@ -457,6 +461,9 @@ function enterBlock() {
   bcolor = 4; //ブロックの色
 
   initBlock(); // ブロック初期化
+
+  spd -= 0.2; //スピードアップ
+  if(spd < 8) spd = 8;
 }
 
 function deleteJudge() {
