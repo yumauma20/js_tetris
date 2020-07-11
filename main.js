@@ -294,8 +294,27 @@ function init() {
   spd = 30;
 }
 
+// キー操作「可能・不可能」判定
+function ctrlJudge() {
+  var num; //一番上にあるブロックの位置
+  var breakflag = false;
+
+  for(var i = 0; i < BLOCK_HEIGHT; i++) {
+    for(var j = 0; j < BLOCK_WIDTH; j++) {
+      if(block[btype][brot][i][j] == 1 ) { //ブロックなら
+        num = i; //行番号を取得
+        breaking = true; //ループを抜ける
+      }
+    }
+    if(breakflag)break;
+  }
+  return num;
+}
+
 // キー操作関数
 function keyCtrl() {
+  if(by < -ctrlJudge()) return; //フィールドをはみ出していたら処理しない（０行目より上なら）
+
   if(key[KEY_RIGHT] <= 1 && key[KEY_LEFT] <= 1) {
     bx += key[KEY_RIGHT] - key[KEY_LEFT]; //横移動
 
