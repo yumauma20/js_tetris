@@ -249,6 +249,8 @@ var delflag; //ブロックの削除フラグ
 var dropflag; //行削除後のブロック落下フラグ
 var cnt;
 
+var gameoverflag; //ゲームオーバーフラグ
+
 function init() {
   cnt = 1; //カウンタ変数
 
@@ -301,6 +303,8 @@ function init() {
   spd = 30;
 
   score = 0;
+
+  gameoverflag = false;
 }
 
 // キー操作「可能・不可能」判定
@@ -679,9 +683,11 @@ requestAnimationFrame(main);
 function main() {
   context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  keyCtrl(); // キー操作
-  update(); //更新
-  enterBlock(); //ブロックの登録
+  if(!gameoverflag) { //ゲームオーバーなら実行しない
+    keyCtrl(); // キー操作
+    update(); //更新
+    enterBlock(); //ブロックの登録
+  }
 
   drawBlock(); //ブロックを描画
   drawField(); //フィールドを描画
@@ -689,6 +695,14 @@ function main() {
   drawNextBlock(); // Next表示を描画
 
   cnt++; //カウンタを更新
+
+  //ゲームオーバー判定（0行目にブロックが登録されたら）
+  for(var i = 0; i < FIELD_WIDTH; i++) {
+    if(field[0][i] != 0 && field[0][i] != 9) {
+      gameoverflag = true;
+      break;
+    }
+  }
 
   requestAnimationFrame(main);
 }
