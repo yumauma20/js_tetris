@@ -23,6 +23,9 @@ let FIELD_Y = 40;　//フィールドのcanvas内のY座標
 let NEXT_FIELD_X	= CANVAS_WIDTH - 200; // Next表示用の枠の左上座標（X）
 let NEXT_FIELD_Y	= FIELD_Y; // Next表示用の枠の左上座標（Y）
 
+let SCORE_PAIN_X	= NEXT_FIELD_X; // スコア表示領域の枠の左上座標（X）
+let SCORE_PAIN_Y	= CANVAS_HEIGHT / 2; // スコア表示領域の枠の左上座標（Y）
+
 let KEY_RIGHT		= 0; // 右キー
 let KEY_LEFT		= 1; // 左キー
 let KEY_UP			= 2; // 上キー
@@ -244,6 +247,7 @@ var nbtype, nbrot, nbcolor; // Next表示用
 var spd; //スピード
 
 var score; //スコア
+var delnum //削除した色の個数
 
 var delflag; //ブロックの削除フラグ
 var dropflag; //行削除後のブロック落下フラグ
@@ -303,6 +307,8 @@ function init() {
   spd = 30;
 
   score = 0;
+  delnum = Array(4); //削除した色の個数
+  for(var i = 0; i < 4; i++)delnum[i] = 0; //初期化
 
   gameoverflag = false;
 }
@@ -518,10 +524,10 @@ function deleteJudge() {
 
     for(var j = 1;j < FIELD_WIDTH - 1;j++) {
 			switch(field[i][j]) {
-			case 1: score += BLOCK_RED_SCORE; break; // 赤の得点を追加
-			case 2: score += BLOCK_BLU_SCORE; break; // 青の得点を追加
-			case 3: score += BLOCK_GRE_SCORE; break; // 緑の得点を追加
-			case 4: score += BLOCK_YEL_SCORE; break; // 黄の得点を追加
+        case 1: score += BLOCK_RED_SCORE; delnum[0]++; break; // 赤の得点を追加
+        case 2: score += BLOCK_BLU_SCORE; delnum[1]++; break; // 青の得点を追加
+        case 3: score += BLOCK_GRE_SCORE; delnum[2]++; break; // 緑の得点を追加
+        case 4: score += BLOCK_YEL_SCORE; delnum[3]++; break; // 黄の得点を追加
 			}
 		}
 
@@ -638,6 +644,48 @@ function drawNextBlock() {
 	context.fillRect(NEXT_FIELD_X, 70, 150, 1);
 }
 
+//	スコア・操作説明などの描画
+function drawScorePain() {
+	// スコア表示
+	context.fillStyle = "rgba(230, 230, 230, 1.0)"; // 文字色の設定
+	context.font = "bold 24px sans-serif"; // 文字フォントの設定
+	
+	context.fillText("Score: " + score, SCORE_PAIN_X + 15, SCORE_PAIN_Y); // 文字の描画（スコア表示）
+	
+	//	削除した色の個数表示
+	for(var i = 0;i < 4;i++) {
+		var col, str;
+		//	表示する色・文字列の設定
+		switch(i) {
+		case 0: col = BLOCK_RED_COLOR; str = "(+3)   x "; break; // 削除した赤の個数
+		case 1: col = BLOCK_BLU_COLOR; str = "(+5)   x "; break; // 削除した青の個数
+		case 2: col = BLOCK_GRE_COLOR; str = "(+10) x "; break; // 削除した緑の個数
+		case 3: col = BLOCK_YEL_COLOR; str = "(+15) x "; break; // 削除した黄の個数
+		}
+		context.fillStyle = col; // 矩形の色を設定
+		context.fillRect(SCORE_PAIN_X + 15, SCORE_PAIN_Y + 30 * (i + 1), 25, 25); // 矩形を描画
+		
+		context.fillStyle = "rgba(230, 230, 230, 1.0)"; // 文字色を設定
+		context.font = "bold 16px sans-serif"; // 文字フォントを設定
+		context.fillText(str + delnum[i], SCORE_PAIN_X + 30 + 15, SCORE_PAIN_Y + 30 * (i + 1) + 18); // 文字を描画
+	}
+	
+	context.fillStyle = "rgba(230, 230, 230, 1.0)"; // 文字色を設定
+	context.font = "bold 18px sans-serif"; // 文字フォントを設定
+	
+	//	操作方法の表示
+	context.fillText("←・→： 移動", SCORE_PAIN_X + 15, SCORE_PAIN_Y + 30 * 6);
+	context.fillText("↑・↓： 左・右回転", SCORE_PAIN_X + 15, SCORE_PAIN_Y + 30 * 7);
+	context.fillText("SPACE： 加速", SCORE_PAIN_X + 15, SCORE_PAIN_Y + 30 * 8);
+	
+	//	枠の描画
+	context.fillStyle = "rgba(230, 230, 230, 1.0)";
+	context.fillRect(SCORE_PAIN_X, SCORE_PAIN_Y - 30, 1, 290);
+	context.fillRect(SCORE_PAIN_X + 180, SCORE_PAIN_Y - 30, 1, 290);
+	context.fillRect(SCORE_PAIN_X, SCORE_PAIN_Y - 30, 180, 1);
+	context.fillRect(SCORE_PAIN_X, SCORE_PAIN_Y - 30 + 290, 180, 1);
+}
+
 //ブロック初期化関数
 function initBlock() {
   btype = nbtype; // 落下ブロックの種類
@@ -693,6 +741,7 @@ function main() {
   drawField(); //フィールドを描画
   drawFrame(); //フィールド枠を描画
   drawNextBlock(); // Next表示を描画
+  drawScorePain(); //スコア領域を描画
 
   cnt++; //カウンタを更新
 
