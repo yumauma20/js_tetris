@@ -1,6 +1,9 @@
 let CANVAS_WIDTH = 600; //canvasの幅
 let CANVAS_HEIGHT = 600; //canvasの高さ
 
+let SCENE_TITLE = 0; //タイトル画面
+let SCENE_GAME = 1; //ゲーム画面
+
 let BLOCK_WIDTH = 4; //ブロックの領域幅
 let BLOCK_HEIGHT = 4; //ブロックの領域高さ
 
@@ -255,6 +258,10 @@ var cnt;
 
 var gameoverflag; //ゲームオーバーフラグ
 
+var scene; //場面切り替え用変数
+
+var bestscore = -1; //ベストスコア（最初はスコアが表示されていない）
+
 function init() {
   cnt = 1; //カウンタ変数
 
@@ -311,6 +318,8 @@ function init() {
   for(var i = 0; i < 4; i++)delnum[i] = 0; //初期化
 
   gameoverflag = false;
+
+  scene = SCENE_TITLE; //タイトル画面に設定
 }
 
 // キー操作「可能・不可能」判定
@@ -710,6 +719,8 @@ document.addEventListener("keydown", e => { //キー押下処理
     case 38: key[KEY_UP]++; break;
     case 40: key[KEY_DOWN]++; break;
     case 32: key[KEY_SPACE]++; break;
+    case 13: if(scene == SCENE_TITLE) scene = SCENE_GAME; //タイトルからゲーム画面
+      if(gameoverflag) init(); break; //ゲームオーバーならエンターでタイトルへ
   }
 });
 
@@ -731,6 +742,23 @@ requestAnimationFrame(main);
 function main() {
   context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+  if(scene == SCENE_TITLE) {
+    context.fillStyle = "rgba(230, 230, 230, 1.0)"; // 文字色の設定
+		context.font = "bold 48px sans-serif"; // 文字フォントの設定
+		context.fillText("テトリス", CANVAS_WIDTH / 3, CANVAS_HEIGHT / 3); // 文字の描画
+		context.font = "bold 32px sans-serif"; // 文字フォントの設定
+		context.fillText("はじめる（Enter）", CANVAS_WIDTH / 3, CANVAS_HEIGHT / 3 + 100); // 文字の描画
+		
+		//	最高スコアの表示
+		if(bestscore == -1) { // スコアが１回も出されていない場合
+			context.fillText("最高スコア：ー", CANVAS_WIDTH / 3, CANVAS_HEIGHT / 3 + 200);
+		}
+		else { // スコアが出された場合
+			context.fillText("最高スコア：" + bestscore, CANVAS_WIDTH / 3, CANVAS_HEIGHT / 3 + 200);
+		}
+  }
+  else if(scene == SCENE_GAME) {
+
   if(!gameoverflag) { //ゲームオーバーなら実行しない
     keyCtrl(); // キー操作
     update(); //更新
@@ -749,9 +777,11 @@ function main() {
   for(var i = 0; i < FIELD_WIDTH; i++) {
     if(field[0][i] != 0 && field[0][i] != 9) {
       gameoverflag = true;
+      bestscore = (score > bestscore ? score : bestscore);
       break;
     }
   }
+}
 
   requestAnimationFrame(main);
 }
