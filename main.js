@@ -9,6 +9,11 @@ let BLOCK_BLU_COLOR	= "rgba(100, 100, 255, 1.0)"; // 青色
 let BLOCK_GRE_COLOR	= "rgba(100, 255, 100, 1.0)"; // 緑色
 let BLOCK_YEL_COLOR	= "rgba(255, 255, 100, 1.0)"; // 黄色
 
+let BLOCK_RED_SCORE	= 3; // 赤ブロックのスコア
+let BLOCK_BLU_SCORE	= 5; // 青ブロックのスコア
+let BLOCK_GRE_SCORE	= 10;// 緑ブロックのスコア
+let BLOCK_YEL_SCORE	= 15;// 黄ブロックのスコア
+
 let FIELD_WIDTH = 12; //フィールドの幅
 let FIELD_HEIGHT = 22;　//フィールドの高さ
 
@@ -238,6 +243,8 @@ var nbtype, nbrot, nbcolor; // Next表示用
 
 var spd; //スピード
 
+var score; //スコア
+
 var delflag; //ブロックの削除フラグ
 var dropflag; //行削除後のブロック落下フラグ
 var cnt;
@@ -292,6 +299,8 @@ function init() {
   dropflag = false;
 
   spd = 30;
+
+  score = 0;
 }
 
 // キー操作「可能・不可能」判定
@@ -502,6 +511,15 @@ function deleteJudge() {
     if(!delflag[i])continue;
 
     if(!dropflag) dropflag = true; //落下フラグがオフならオンに
+
+    for(var j = 1;j < FIELD_WIDTH - 1;j++) {
+			switch(field[i][j]) {
+			case 1: score += BLOCK_RED_SCORE; break; // 赤の得点を追加
+			case 2: score += BLOCK_BLU_SCORE; break; // 青の得点を追加
+			case 3: score += BLOCK_GRE_SCORE; break; // 緑の得点を追加
+			case 4: score += BLOCK_YEL_SCORE; break; // 黄の得点を追加
+			}
+		}
 
     //ブロック行を削除
     for(var j = 1; j < FIELD_WIDTH - 1; j++) field[i][j] = 0;
